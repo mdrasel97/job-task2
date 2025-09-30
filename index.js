@@ -12,18 +12,13 @@ fs.createReadStream("website.csv")
     results.forEach((row) => {
       const targetDir = path.join(__dirname, "build", row.domain);
 
-      // Template app copy করো
+      // Template app
       fse.copySync(path.join(__dirname, "template-app"), targetDir);
 
-      // data.json লিখে দাও
-      const dataJson = {
-        headline: row.title,
-        phone: row.phone,
-        address: row.address,
-      };
-      fs.writeFileSync(
-        path.join(targetDir, "src", "data.json"),
-        JSON.stringify(dataJson, null, 2)
+      // React app a CSV copy
+      fs.copyFileSync(
+        path.join(__dirname, "website.csv"),
+        path.join(targetDir, "public", "website.csv")
       );
 
       console.log(`${row.domain} ready!`);
