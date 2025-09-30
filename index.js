@@ -1,34 +1,32 @@
-const fs = require("fs-extra");
-const csv = require("csv-parser");
+const fs = require("fs");
 const path = require("path");
+const fse = require("fs-extra");
+const csv = require("csv-parser");
 
 const results = [];
 
 fs.createReadStream("website.csv")
   .pipe(csv())
   .on("data", (data) => results.push(data))
-  .on("end", async () => {
-    for (const site of results) {
-      const buildPath = path.join("build", site.domain);
+  .on("end", () => {
+    results.forEach((row) => {
+      const targetDir = path.join(__dirname, "build", row.domain);
 
-      // template কপি করো
-      await fs.copy("template", buildPath);
+      // Template app copy করো
+      fse.copySync(path.join(__dirname, "template-app"), targetDir);
 
-      // নিশ্চিত করো যে src ফোল্ডার আছে
-      const srcPath = path.join(buildPath, "src");
-      await fs.ensureDir(srcPath);
-
-      // data.json লিখো
-      const data = {
-        phone: site.phone,
-        address: site.address,
+      // data.json লিখে দাও
+      const dataJson = {
+        headline: row.title,
+        phone: row.phone,
+        address: row.address,
       };
-      await fs.writeFile(
-        path.join(srcPath, "data.json"),
-        JSON.stringify(data, null, 2)
+      fs.writeFileSync(
+        path.join(targetDir, "src", "data.json"),
+        JSON.stringify(dataJson, null, 2)
       );
 
-      console.log(`${site.domain} ready!`);
-    }
+      console.log(`${row.domain} ready!`);
+    });
     console.log("All React apps generated!");
   });
