@@ -31,8 +31,14 @@ function App() {
 
   return (
     <>
-      <Hero headline={data.headline} />
-      <Contact phone={data.phone} address={data.address} />
+      <section className="app-container">
+        <div className="card">
+          <div className="card-body">
+            <Hero headline={data.headline} />
+            <Contact phone={data.phone} address={data.address} />
+          </div>
+        </div>
+      </section>
     </>
   );
 }
