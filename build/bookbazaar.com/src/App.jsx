@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Papa from "papaparse";
 import Hero from "./Hero";
 import Contact from "./Contact";
+import { DOMAIN } from "./config";
 
 function App() {
   const [data, setData] = useState(null);
@@ -10,10 +11,14 @@ function App() {
     Papa.parse("/website.csv", {
       download: true,
       header: true,
+      skipEmptyLines: true,
       complete: (result) => {
-        const row = result.data[0];
+        const row = result.data.find((r) => r.domain && r.domain === DOMAIN);
+        if (!row) {
+          console.error(`No CSV row found for domain: ${DOMAIN}`);
+          return;
+        }
 
-        // Hero random word
         const headlines = ["Quick", "Fast", "Speedy"];
         const randomWord =
           headlines[Math.floor(Math.random() * headlines.length)];
@@ -30,16 +35,14 @@ function App() {
   if (!data) return <p>Loading...</p>;
 
   return (
-    <>
-      <section className="app-container">
-        <div className="card">
-          <div className="card-body">
-            <Hero headline={data.headline} />
-            <Contact phone={data.phone} address={data.address} />
-          </div>
+    <section className="app-container">
+      <div className="card">
+        <div className="card-body">
+          <Hero headline={data.headline} />
+          <Contact phone={data.phone} address={data.address} />
         </div>
-      </section>
-    </>
+      </div>
+    </section>
   );
 }
 
